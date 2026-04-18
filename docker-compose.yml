@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: nyc311_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nyc311
+      POSTGRES_USER: nyc311_user
+      POSTGRES_PASSWORD: nyc311_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - nyc311_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  nyc311_postgres_data:

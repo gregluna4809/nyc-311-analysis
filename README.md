@@ -21,6 +21,19 @@ An end-to-end data pipeline and interactive dashboard analyzing **794,226 NYC 31
 
 ---
 
+---
+
+## Screenshots
+
+### Overview — KPIs and monthly complaint volume
+![Dashboard overview with 794,226 total requests](screenshots/dashboard-overview.png)
+
+### Complaint composition by borough
+![Top complaint types and heat complaint share](screenshots/complaints-heat.png)
+
+### Response times and anomaly detection
+![Agency response times and borough overrepresentation](screenshots/response-anomaly.png)
+
 ## Architecture
 
 ```

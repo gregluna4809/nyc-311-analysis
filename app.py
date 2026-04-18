@@ -21,22 +21,47 @@ with HEAT/HOT WATER accounting for over 24% of all service requests.
 """
 )
 
+
+def get_database_url() -> str:
+    """
+    Return the Postgres connection URL.
+
+    On Streamlit Cloud, reads from st.secrets (configured in the UI).
+    Locally, reads from the DATABASE_URL env var (configured in .env).
+    """
+    try:
+        # st.secrets is only present when running on Streamlit Cloud
+        # (or when a local .streamlit/secrets.toml exists)
+        return st.secrets["DATABASE_URL"]
+    except (KeyError, FileNotFoundError):
+        pass
+
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        raise RuntimeError(
+            "DATABASE_URL not found. Set it in .env (local) or "
+            "Streamlit Cloud secrets (deployed)."
+        )
+    return url
+
+
+@st.cache_resource
 def get_connection():
-    return psycopg2.connect(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-    )
+    """
+    Cached database connection, shared across Streamlit reruns.
+
+    Using cache_resource (instead of creating a new connection each time)
+    matters for cloud deployment — every new connection to Supabase is
+    a network round-trip, so reusing a single connection is much faster.
+    """
+    return psycopg2.connect(get_database_url())
+
 
 @st.cache_data(show_spinner=False)
 def run_query(query: str) -> pd.DataFrame:
     conn = get_connection()
-    try:
-        return pd.read_sql(query, conn)
-    finally:
-        conn.close()
+    return pd.read_sql(query, conn)
+
 
 summary_query = """
 SELECT

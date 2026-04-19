@@ -66,7 +66,9 @@ def run_query(query: str) -> pd.DataFrame:
 summary_query = """
 SELECT
     COUNT(*) AS total_requests,
-    COUNT(DISTINCT borough) AS borough_count,
+    COUNT(DISTINCT CASE
+        WHEN borough NOT IN ('', 'Unspecified') THEN borough
+    END) AS borough_count,
     MIN(created_date) AS min_date,
     MAX(created_date) AS max_date
 FROM service_requests;
